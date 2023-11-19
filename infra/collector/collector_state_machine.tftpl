@@ -1,0 +1,136 @@
+{
+    "Comment": "コストデータ集約ステートマシン（独立エラーハンドリングと再試行ポリシー付き）",
+    "StartAt": "ParallelDataCollection",
+    "States": {
+        "ParallelDataCollection": {
+            "Type": "Parallel",
+            "Next": "FinalState",
+            "Branches": [
+                {
+                    "StartAt": "FetchAWSCost",
+                    "States": {
+                        "FetchAWSCost": {
+                            "Type": "Task",
+                            "Resource": "${function_arn}",
+                            "Parameters": {
+                                "Provider": "AWS",
+                                "LogGroup": "/cost/daily"
+                            },
+                            "Retry": [
+                                {
+                                    "ErrorEquals": [
+                                        "States.ALL"
+                                    ],
+                                    "IntervalSeconds": 30,
+                                    "MaxAttempts": 3,
+                                    "BackoffRate": 2.0
+                                }
+                            ],
+                            "Catch": [
+                                {
+                                    "ErrorEquals": [
+                                        "States.ALL"
+                                    ],
+                                    "Next": "HandleAWSError"
+                                }
+                            ],
+                            "End": true
+                        },
+                        "HandleAWSError": {
+                            "Type": "Task",
+                            "Resource": "${notifier_function_arn}",
+                            "Parameters": {
+                                "message": "AWSのコスト取得に失敗しました"
+                            },
+                            "End": true
+                        }
+                    }
+                },
+                {
+                    "StartAt": "FetchAzureCost",
+                    "States": {
+                        "FetchAzureCost": {
+                            "Type": "Task",
+                            "Resource": "${function_arn}",
+                            "Parameters": {
+                                "Provider": "Azure",
+                                "LogGroup": "/cost/daily"
+                            },
+                            "Retry": [
+                                {
+                                    "ErrorEquals": [
+                                        "States.ALL"
+                                    ],
+                                    "IntervalSeconds": 30,
+                                    "MaxAttempts": 3,
+                                    "BackoffRate": 2.0
+                                }
+                            ],
+                            "Catch": [
+                                {
+                                    "ErrorEquals": [
+                                        "States.ALL"
+                                    ],
+                                    "Next": "HandleAzureError"
+                                }
+                            ],
+                            "End": true
+                        },
+                        "HandleAzureError": {
+                            "Type": "Task",
+                            "Resource": "${notifier_function_arn}",
+                            "Parameters": {
+                                "message": "Azureのコスト取得に失敗しました"
+                            },
+                            "End": true
+                        }
+                    }
+                },
+                {
+                    "StartAt": "FetchGCPCost",
+                    "States": {
+                        "FetchGCPCost": {
+                            "Type": "Task",
+                            "Resource": "${function_arn}",
+                            "Parameters": {
+                                "Provider": "GCP",
+                                "LogGroup": "/cost/daily"
+                            },
+                            "Retry": [
+                                {
+                                    "ErrorEquals": [
+                                        "States.ALL"
+                                    ],
+                                    "IntervalSeconds": 30,
+                                    "MaxAttempts": 3,
+                                    "BackoffRate": 2.0
+                                }
+                            ],
+                            "Catch": [
+                                {
+                                    "ErrorEquals": [
+                                        "States.ALL"
+                                    ],
+                                    "Next": "HandleGCPError"
+                                }
+                            ],
+                            "End": true
+                        },
+                        "HandleGCPError": {
+                            "Type": "Task",
+                            "Resource": "${notifier_function_arn}",
+                            "Parameters": {
+                                "message": "GCPのコスト取得に失敗しました"
+                            },
+                            "End": true
+                        }
+                    }
+                }
+            ]
+        },
+        "FinalState": {
+            "Type": "Pass",
+            "End": true
+        }
+    }
+}

@@ -1,0 +1,20 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/typescript-node
+{
+	"name": "Node.js & TypeScript",
+	"image": "mcr.microsoft.com/devcontainers/typescript-node:1-20-bullseye",
+	"features": {
+		"ghcr.io/devcontainers/features/aws-cli:1": {},
+		"ghcr.io/devcontainers/features/git:1": {}
+	},
+	// extensions to install
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"hashicorp.terraform",
+				"github.copilot"
+			]
+		}
+	},
+	"postCreateCommand": "sudo apt update && sudo apt install -y software-properties-common wget && wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg && echo \"deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main\" | sudo tee /etc/apt/sources.list.d/hashicorp.list && sudo apt update && sudo apt install terraform"
+}

@@ -1,0 +1,6 @@
+.env
+.terraform/
+*.zip
+node_modules/
+**/dist
+**/serviceaccount-key.json

@@ -1,0 +1,102 @@
+{
+    "Comment": "Create CloudWatch Logs Streams for providers monthly with a single Lambda function.",
+    "StartAt": "CreateLogsStreams",
+    "States": {
+        "CreateLogsStreams": {
+            "Type": "Parallel",
+            "Branches": [
+                {
+                    "StartAt": "CreateAwsLogStream",
+                    "States": {
+                        "CreateAwsLogStream": {
+                            "Type": "Task",
+                            "Resource": "${function_arn}",
+                            "Parameters": {
+                                "Provider": "AWS",
+                                "LogGroup": "/cost/daily"
+                            },
+                            "Catch": [
+                                {
+                                    "ErrorEquals": [
+                                        "States.ALL"
+                                    ],
+                                    "Next": "HandleAWSError"
+                                }
+                            ],
+                            "End": true
+                        },
+                        "HandleAWSError": {
+                            "Type": "Task",
+                            "Resource": "${notifier_function_arn}",
+                            "Parameters": {
+                                "message": "AWSのLogStream作成に失敗しました"
+                            },
+                            "End": true
+                        }
+                    }
+                },
+                {
+                    "StartAt": "CreateAzureLogStream",
+                    "States": {
+                        "CreateAzureLogStream": {
+                            "Type": "Task",
+                            "Resource": "${function_arn}",
+                            "Parameters": {
+                                "Provider": "Azure",
+                                "LogGroup": "/cost/daily"
+                            },
+                            "Catch": [
+                                {
+                                    "ErrorEquals": [
+                                        "States.ALL"
+                                    ],
+                                    "Next": "HandleAzureError"
+                                }
+                            ],
+                            "End": true
+                        },
+                        "HandleAzureError": {
+                            "Type": "Task",
+                            "Resource": "${notifier_function_arn}",
+                            "Parameters": {
+                                "message": "AzureのLogStream作成に失敗しました"
+                            },
+                            "End": true
+                        }
+                    }
+                },
+                {
+                    "StartAt": "CreateGcpLogStream",
+                    "States": {
+                        "CreateGcpLogStream": {
+                            "Type": "Task",
+                            "Resource": "${function_arn}",
+                            "Parameters": {
+                                "Provider": "GCP",
+                                "LogGroup": "/cost/daily"
+                            },
+                            "Catch": [
+                                {
+                                    "ErrorEquals": [
+                                        "States.ALL"
+                                    ],
+                                    "Next": "HandleGCPError"
+                                }
+                            ],
+                            "End": true
+                        },
+                        "HandleGCPError": {
+                            "Type": "Task",
+                            "Resource": "${notifier_function_arn}",
+                            "Parameters": {
+                                "message": "GCPのLogStream作成に失敗しました"
+                            },
+                            "End": true
+                        }
+                    }
+                }
+            ],
+            "End": true
+        }
+    }
+}

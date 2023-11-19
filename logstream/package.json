@@ -1,0 +1,16 @@
+{
+  "name": "logstream",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "rm -r dist/* & tsc"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@aws-sdk/client-cloudwatch-logs": "^3.441.0",
+    "@types/aws-lambda": "^8.10.125"
+  }
+}
