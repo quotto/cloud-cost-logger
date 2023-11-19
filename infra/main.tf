@@ -13,6 +13,8 @@ variable "azure_subscription_id" {}
 
 variable "azure_tenant_id" {}
 
+variable "slack_webhook_url" {}
+
 
 provider "aws" {
   region = "ap-northeast-1"
@@ -34,4 +36,7 @@ module "logstream" {
 
 module "notifier" {
   source = "./notifier"
+  slack_webhook_url = var.slack_webhook_url
+  collector_state_machine_arn = module.collector.collector_state_machine_arn
+  logstream_state_machine_arn = module.logstream.logstream_state_machine_arn
 }

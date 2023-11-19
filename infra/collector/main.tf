@@ -33,7 +33,7 @@ data "archive_file" "cost_collector_zip" {
   type        = "zip"
   source_dir  = "${path.root}/../collector"
   output_path = "${path.root}/../collector/cost_collector.zip"
-  excludes = ["src"]
+  excludes = ["src","*.zip"]
 }
 
 resource "aws_cloudwatch_event_rule" "daily_trigger" {

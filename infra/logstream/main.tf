@@ -13,7 +13,7 @@ data "archive_file" "logstream_creator_zip" {
   type        = "zip"
   source_dir  = "${path.root}/../logstream"
   output_path = "${path.root}/../logstream/logstream_creator.zip"
-  excludes = ["src"]
+  excludes = ["src","*.zip"]
 }
 
 variable "notifier_function_arn" {
@@ -96,7 +96,7 @@ resource "aws_lambda_permission" "allow_state_machine_logstream_creator" {
 }
 
 resource "aws_sfn_state_machine" "logstream_state_machine" {
-  name     = "LogstreamCreationStateMachine"
+  name     = "ccl-logstream-state-machine"
   role_arn = aws_iam_role.state_machine_role.arn
 
   definition = templatefile("${path.module}/logstream_state_machine.tftpl", {
