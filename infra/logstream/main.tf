@@ -131,7 +131,8 @@ resource "aws_iam_policy" "state_machine_policy" {
           "lambda:InvokeFunction"
         ],
         Resource: [
-          aws_lambda_function.logstream_creator.arn
+          aws_lambda_function.logstream_creator.arn,
+          var.notifier_function_arn
         ],
         Effect: "Allow"
       }

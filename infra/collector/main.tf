@@ -40,6 +40,7 @@ resource "aws_cloudwatch_event_rule" "daily_trigger" {
   name                = "ccl-collector-event-bridge-rule"
   schedule_expression = "cron(0 15 * * ? *)" # Terraformからタイムゾーンが指定できないためAsia/Tokyoの0時に合わせてUTC時刻を指定
   role_arn = aws_iam_role.event_bridge_role.arn
+
 }
 
 resource "aws_cloudwatch_event_target" "daily_sfn_target" {
@@ -47,6 +48,7 @@ resource "aws_cloudwatch_event_target" "daily_sfn_target" {
   target_id = "CollectorStateMachineTarget"
   arn       = aws_sfn_state_machine.cost_collection_state_machine.arn
   role_arn = aws_iam_role.event_bridge_role.arn
+
 }
 
 resource "aws_iam_role" "event_bridge_role" {
@@ -189,7 +191,8 @@ resource "aws_iam_policy" "state_machine_policy" {
           "lambda:InvokeFunction"
         ],
         Resource: [
-          aws_lambda_function.cost_collector.arn
+          aws_lambda_function.cost_collector.arn,
+          var.notifier_function_arn
         ],
         Effect: "Allow"
       }
